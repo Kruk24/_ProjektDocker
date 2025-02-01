@@ -1,0 +1,31 @@
+
+services:
+  database:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sqlBank4
+      POSTGRES_DB: library_db
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+
+  backend:
+    build: ./LibraryAPI
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on:
+      database:
+        condition: service_healthy
+    
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
